@@ -116,16 +116,14 @@ togglbutton.render(
     const titleElem = $('#summary-val', elem) || '';
     let projectElem = $('.bgdPDV');
     let description;
+    let tags;
 
     if (titleElem) {
       description = titleElem.textContent.trim();
     }
 
     if (numElem !== null) {
-      if (description) {
-        description = ' ' + description;
-      }
-      description = numElem.textContent + description;
+      tags = [numElem.textContent];
     }
 
     if (projectElem === null) {
@@ -139,7 +137,8 @@ togglbutton.render(
     const link = togglbutton.createTimerLink({
       className: 'jira2017',
       description: description,
-      projectName: projectElem && projectElem.textContent.trim()
+      projectName: projectElem && projectElem.textContent.trim(),
+      tags: tags
     });
 
     link.style.marginLeft = '8px';
@@ -158,15 +157,17 @@ togglbutton.render('#ghx-detail-issue:not(.toggl)', { observe: true }, function 
   const titleElem = $('[data-field-id="summary"]', elem);
   const numElem = $('.ghx-fieldname-issuekey a');
   const projectElem = $('.ghx-project', elem);
-  let description = titleElem.textContent;
+  const description = titleElem.textContent;
+  let tags;
   if (numElem !== null) {
-    description = numElem.textContent + ' ' + description;
+    tags = [numElem.textContent];
   }
 
   const link = togglbutton.createTimerLink({
     className: 'jira',
     description: description,
-    projectName: projectElem && projectElem.textContent
+    projectName: projectElem && projectElem.textContent,
+    tags: tags
   });
 
   container.appendChild(link);
