@@ -527,7 +527,33 @@ window.TogglButton = {
     }
   },
 
-  findProjectByName: function (nameOrNames) {
+  getRandomColor: function () {
+    const choices = ['0b83d9', '9e5bd9', 'd94182', 'e36a00', 'bf7000', '2da608', '06a893', 'c9806b', '465bb3', '990099', 'c7af14', '566614', 'd92b2b', '525266', '991102'];
+    return `#${choices[Math.floor(Math.random() * choices.length)]}`;
+  },
+
+  createProject: function (projectName, defaultProject) {
+    const payload = {
+      name: projectName,
+      wid: defaultProject.wid,
+      cid: defaultProject.cid,
+      active: true,
+      is_private: true,
+      color: TogglButton.getRandomColor()
+    };
+
+    const xhr = TogglButton.ajax(`/workspaces/${payload.wid}/projects`, {
+      method: 'POST',
+      baseUrl: TogglButton.$ApiV9Url,
+      payload,
+      synchronous: true
+    });
+    // Reload projects.
+    TogglButton.fetchUser();
+    return JSON.parse(xhr.responseText);
+  },
+
+  findProjectByName: function (nameOrNames, defaultProject) {
     let key;
     let name;
     const names = [].concat(nameOrNames);
@@ -548,7 +574,8 @@ window.TogglButton = {
         }
       }
     }
-    return result;
+    // Project not found. Create a new one.
+    return result || TogglButton.createProject(nameOrNames, defaultProject);
   },
 
   findProjectByPid: function (pid) {
@@ -617,7 +644,7 @@ window.TogglButton = {
     };
 
     if (timeEntry.projectName !== null && !entry.pid) {
-      project = TogglButton.findProjectByName(timeEntry.projectName);
+      project = TogglButton.findProjectByName(timeEntry.projectName, TogglButton.findProjectByPid(defaultProject));
       entry.pid = (project && project.id) || null;
       entry.billable = project && project.billable;
       entry.wid = (project && project.wid) || entry.wid;
@@ -830,7 +857,7 @@ window.TogglButton = {
         localStorage.getItem('userToken');
     const credentials = opts.credentials || null;
 
-    xhr.open(method, resolvedUrl, true);
+    xhr.open(method, resolvedUrl, opts.synchronous === undefined);
     xhr.setRequestHeader('IsTogglButton', 'true');
 
     if (resolvedUrl.match(TogglButton.$ApiUrl)) {
@@ -861,6 +888,7 @@ window.TogglButton = {
       xhr.overrideMimeType('application/json');
     }
     xhr.send(JSON.stringify(opts.payload));
+    return xhr;
   },
 
   resetPomodoroProgress: function (entry) {
