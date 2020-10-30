@@ -114,31 +114,21 @@ togglbutton.render(
 
     const numElem = $('#key-val', elem);
     const titleElem = $('#summary-val', elem) || '';
-    let projectElem = $('.bgdPDV');
     let description;
-    let tags;
+    let projectName;
 
     if (titleElem) {
       description = titleElem.textContent.trim();
     }
 
     if (numElem !== null) {
-      tags = [numElem.textContent];
-    }
-
-    if (projectElem === null) {
-      projectElem = $('[data-test-id="navigation-apps.project-switcher-v2"] button > div:nth-child(2) > div');
-    }
-    // JIRA server support
-    if (projectElem === null) {
-      projectElem = $('#project-name-val');
+      projectName = numElem.textContent;
     }
 
     const link = togglbutton.createTimerLink({
       className: 'jira2017',
       description: description,
-      projectName: projectElem && projectElem.textContent.trim(),
-      tags: tags
+      projectName: projectName
     });
 
     link.style.marginLeft = '8px';
@@ -156,18 +146,16 @@ togglbutton.render('#ghx-detail-issue:not(.toggl)', { observe: true }, function 
   const container = createTag('div', 'ghx-toggl-button');
   const titleElem = $('[data-field-id="summary"]', elem);
   const numElem = $('.ghx-fieldname-issuekey a');
-  const projectElem = $('.ghx-project', elem);
   const description = titleElem.textContent;
-  let tags;
+  let projectName;
   if (numElem !== null) {
-    tags = [numElem.textContent];
+    projectName = numElem.textContent;
   }
 
   const link = togglbutton.createTimerLink({
     className: 'jira',
     description: description,
-    projectName: projectElem && projectElem.textContent,
-    tags: tags
+    projectName: projectName
   });
 
   container.appendChild(link);
